@@ -97,4 +97,4 @@ salesinsight-py/
 Os registros com data inválida ou valores ausentes nas colunas críticas são removidos, pois não permitem calcular a receita de forma confiável. Essa escolha preserva a consistência das métricas e dos gráficos.
 Para classificar a receita por venda, será usado `np.select`, pois ele permite aplicar condições de forma vetorizada, evitando um laco manual sobre cada registro.
 
-## Status do desenvolvimento
+## Status do desenvolvimento ##
