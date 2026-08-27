@@ -66,6 +66,7 @@ df_bruto.to_csv("vendas.csv", index=False)
 print(f"Dataset gerado com {len(df_bruto)} registros.") 
 print(df_bruto.head())
 
+# Inspecionar os dados do DataFrame
 def inspecionar_dados(df):
     """Exibe as informações estruturais do DataFrame."""
     print("\n=== INSPEÇÃO INICIAL DO DATASET ===")
@@ -77,6 +78,7 @@ def inspecionar_dados(df):
     return df
 df_bruto = inspecionar_dados(df_bruto)
 
+# Limpeza dos dados
 def limpar_dados(df):
     """Limpa o DataFrame de vendas e retorna os dados limpos e um relatório."""
 
@@ -107,6 +109,9 @@ def limpar_dados(df):
     antes_remover_nulos = len(df)
 
     df = df.dropna(subset=["quantidade", "preco_unitario"]).copy()
+
+    # 4.1 Resetar o índice após remoção de linhas
+    df = df.reset_index(drop=True)
 
     removidos_nulos_criticos = antes_remover_nulos - len(df)
 
@@ -151,3 +156,88 @@ def limpar_dados(df):
     return df, relatorio
 df_limpo, relatorio_limpeza = limpar_dados(df_bruto)
 inspecionar_dados(df_limpo)
+
+def criar_colunas_derivadas(df):
+    """Cria colunas derivadas no DataFrame."""
+    df = df.copy()
+
+    df["receita_total"] = df["quantidade"] * df["preco_unitario"]
+
+    df["mes"] = df["data_venda"].dt.month
+
+    mes_nome = ({1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho",
+                7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"})
+    
+    df["mes_nome"] = df["mes"].map(mes_nome)
+
+    df["trimestre"] = "Q" + df["data_venda"].dt.quarter.astype(str)
+
+    df["ano"] = df["data_venda"].dt.year
+
+    condicoes = [
+    df["receita_total"] < 500,
+    (df["receita_total"] >= 500) & (df["receita_total"] < 5000),
+    df["receita_total"] >= 5000,
+    ]
+    faixas = ["Baixo Valor", "Medio Valor", "Alto Valor"]
+    df["faixa_receita_item"] = np.select(condicoes, faixas, default="Nao Classificado")
+    return df
+df_transformado = criar_colunas_derivadas(df_limpo)
+print(df_transformado.head())
+
+def calcular_metricas(df):
+    """Calcula as metricas agregadas do dataset."""
+    df = df.copy()
+
+    por_mes = (
+        df.groupby(["mes", "mes_nome"], as_index=False)
+        .agg(
+            receita_total=("receita_total", "sum"),
+            quantidade=("quantidade", "sum"),
+            n_vendas=("id_venda", "count")
+        )
+        .sort_values("mes")
+        .reset_index(drop=True)
+    )
+
+    top_produtos = (
+        df.groupby("produto", as_index=False)
+        .agg(receita_total=("receita_total", "sum"))
+        .sort_values("receita_total", ascending=False)
+        .head(5)
+        .reset_index(drop=True)
+    )
+
+    por_categoria = (
+        df.groupby("categoria", as_index=False)
+        .agg(receita_total=("receita_total", "sum"))
+        .sort_values("receita_total", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    por_regiao = (
+        df.groupby("regiao", as_index=False)
+        .agg(
+            receita_total=("receita_total", "sum"),
+            ticket_medio=("receita_total", "mean")
+        )
+        .sort_values("receita_total", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    metricas = {
+        "por_mes": por_mes,
+        "top_produtos": top_produtos,
+        "por_categoria": por_categoria,
+        "por_regiao": por_regiao
+    }
+    return metricas
+metricas = calcular_metricas(df_transformado)
+print("\n=== POR MÊS ===")
+print(metricas["por_mes"])
+print("\n=== TOP PRODUTOS ===")
+print(metricas["top_produtos"])
+print("\n=== POR CATEGORIA ===")
+print(metricas["por_categoria"])
+print("\n=== POR REGIÃO ===")
+print(metricas["por_regiao"])
