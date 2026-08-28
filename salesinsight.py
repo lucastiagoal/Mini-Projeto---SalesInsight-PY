@@ -4,6 +4,8 @@ import random
 from datetime import datetime, timedelta
 import re
 
+print("\n=== RF01 ===")
+
 def gerar_dataset_vendas(n_registros=200, seed=42): 
     """Gera um dataset sintetico de vendas com dados sujos.""" 
     random.seed(seed)
@@ -31,17 +33,16 @@ def gerar_dataset_vendas(n_registros=200, seed=42):
         data_txt = data.strftime("%Y-%m-%d")
         cliente = f"Cliente_{random.randint(1, 50):03d}"
  
-        # --- sujeira proposital para a etapa de limpeza --- 
         if random.random() < 0.05:
-            quantidade = None                    # valor nulo 
+            quantidade = None                    
         if random.random() < 0.04:
-            preco = None                         # valor nulo 
+            preco = None                         
         if random.random() < 0.06: 
-            produto = "  " + produto + " "       # espacos extras 
+            produto = "  " + produto + " "       
         if random.random() < 0.03: 
-            data_txt = "DATA INVALIDA"           # data invalida 
+            data_txt = "DATA INVALIDA"           
         if random.random() < 0.10: 
-            cliente = random.choice([            # ruido no nome 
+            cliente = random.choice([            
                 cliente.upper().replace("_", "-"), 
                 cliente + "!!", 
                 "  " + cliente, 
@@ -60,13 +61,13 @@ def gerar_dataset_vendas(n_registros=200, seed=42):
         }) 
     return pd.DataFrame(dados) 
 
-# Gerar e salvar o CSV bruto 
 df_bruto = gerar_dataset_vendas() 
 df_bruto.to_csv("vendas.csv", index=False) 
 print(f"Dataset gerado com {len(df_bruto)} registros.") 
 print(df_bruto.head())
 
-# Inspecionar os dados do DataFrame
+print("\n=== RF02 ===")
+
 def inspecionar_dados(df):
     """Exibe as informações estruturais do DataFrame."""
     print("\n=== INSPEÇÃO INICIAL DO DATASET ===")
@@ -78,23 +79,20 @@ def inspecionar_dados(df):
     return df
 df_bruto = inspecionar_dados(df_bruto)
 
-# Limpeza dos dados
+print("\n=== RF03 ===")
+
 def limpar_dados(df):
     """Limpa o DataFrame de vendas e retorna os dados limpos e um relatório."""
 
-    # Evita alterar o DataFrame bruto original
     df = df.copy()
 
-    # 1. Quantidade de registros antes da limpeza
     registros_iniciais = len(df)
 
-    # 2. Remover espaços extras das colunas de texto
     colunas_texto = ["cliente", "produto", "categoria", "regiao"]
 
     for coluna in colunas_texto:
         df[coluna] = df[coluna].str.strip()
 
-    # 3. Converter datas; as inválidas se tornam NaT
     df["data_venda"] = pd.to_datetime(
         df["data_venda"],
         errors="coerce"
@@ -102,24 +100,19 @@ def limpar_dados(df):
 
     removidos_data_invalida = df["data_venda"].isna().sum()
 
-    # Remove as linhas cuja data não pôde ser convertida
     df = df.dropna(subset=["data_venda"]).copy()
 
-    # 4. Contar e remover nulos nas colunas críticas
     antes_remover_nulos = len(df)
 
     df = df.dropna(subset=["quantidade", "preco_unitario"]).copy()
 
-    # 4.1 Resetar o índice após remoção de linhas
     df = df.reset_index(drop=True)
 
     removidos_nulos_criticos = antes_remover_nulos - len(df)
 
-    # 5. Garantir os tipos de dados solicitados
     df["quantidade"] = df["quantidade"].astype(int)
     df["preco_unitario"] = df["preco_unitario"].astype(float)
 
-    # 6. Limpar e validar os nomes dos clientes com regex
     padrao_cliente = re.compile(r"^cliente(\d{3})$", flags=re.IGNORECASE)
 
     def padronizar_cliente(valor):
@@ -140,7 +133,6 @@ def limpar_dados(df):
 
     clientes_fora_padrao = (~df["cliente_valido"]).sum()
 
-    # 7. Montar e exibir o relatório
     relatorio = {
         "registros_iniciais": registros_iniciais,
         "removidos_data_invalida": int(removidos_data_invalida),
@@ -156,6 +148,8 @@ def limpar_dados(df):
     return df, relatorio
 df_limpo, relatorio_limpeza = limpar_dados(df_bruto)
 inspecionar_dados(df_limpo)
+
+print("\n=== RF04 ===")
 
 def criar_colunas_derivadas(df):
     """Cria colunas derivadas no DataFrame."""
@@ -184,6 +178,8 @@ def criar_colunas_derivadas(df):
     return df
 df_transformado = criar_colunas_derivadas(df_limpo)
 print(df_transformado.head())
+
+print("\n=== RF05 ===")
 
 def calcular_metricas(df):
     """Calcula as metricas agregadas do dataset."""
@@ -233,6 +229,7 @@ def calcular_metricas(df):
     }
     return metricas
 metricas = calcular_metricas(df_transformado)
+
 print("\n=== POR MÊS ===")
 print(metricas["por_mes"])
 print("\n=== TOP PRODUTOS ===")
@@ -241,3 +238,32 @@ print("\n=== POR CATEGORIA ===")
 print(metricas["por_categoria"])
 print("\n=== POR REGIÃO ===")
 print(metricas["por_regiao"])
+
+print("\n=== RF06 ===")
+
+def segmentar_clientes(df):
+    """Agrupa clientes por total gasto e os classifica em segmentos."""
+
+    clientes = (
+        df.groupby("cliente", as_index=False)
+        .agg(total_gasto=("receita_total", "sum"))
+        .sort_values("total_gasto", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    clientes["segmento"] = clientes["total_gasto"].apply(
+        lambda gasto:
+            "Bronze" if gasto < 5000
+            else "Prata" if gasto <= 15000
+            else "Ouro"
+    )
+
+    print("\n=== TOP 10 CLIENTES ===")
+    print(clientes.head(10).to_string(index=False))
+
+    print("\n=== DISTRIBUIÇÃO POR SEGMENTO ===")
+    print(clientes["segmento"].value_counts())
+
+    return clientes
+
+clientes = segmentar_clientes(df_transformado)
