@@ -267,3 +267,48 @@ def segmentar_clientes(df):
     return clientes
 
 clientes = segmentar_clientes(df_transformado)
+
+print("\n=== RF07 ===")
+
+def calcular_estatisticas_numpy(df):
+    """Calcula estatísticas e demonstra operações vetorizadas com NumPy."""
+
+    receitas = df["receita_total"].to_numpy()
+
+    media = np.mean(receitas)
+    mediana = np.median(receitas)
+    desvio_padrao = np.std(receitas)
+    receita_total = np.sum(receitas)
+    menor_receita = np.min(receitas)
+    maior_receita = np.max(receitas)
+
+    receitas_escalonadas = (
+        (receitas - receitas.min())
+        / (receitas.max() - receitas.min())
+    )
+
+    receitas_acima_media = receitas[receitas > media]
+
+    estatisticas = {
+        "media_receita": float(media),
+        "mediana_receita": float(mediana),
+        "desvio_padrao_receita": float(desvio_padrao),
+        "receita_total": float(receita_total),
+        "menor_receita": float(menor_receita),
+        "maior_receita": float(maior_receita),
+        "vendas_acima_da_media": int(len(receitas_acima_media))
+    }
+
+    print("\n=== RF07 - OPERAÇÕES COM NUMPY ===")
+    print(f"Média: R$ {media:.2f}")
+    print(f"Mediana: R$ {mediana:.2f}")
+    print(f"Desvio padrão: R$ {desvio_padrao:.2f}")
+    print(f"Receita total: R$ {receita_total:.2f}")
+    print(f"Vendas acima da média: {len(receitas_acima_media)}")
+    print(f"Primeiras receitas escalonadas: {receitas_escalonadas[:5]}")
+
+    return estatisticas
+
+estatisticas = calcular_estatisticas_numpy(df_transformado)
+
+print("\n=== RF08 ===")
