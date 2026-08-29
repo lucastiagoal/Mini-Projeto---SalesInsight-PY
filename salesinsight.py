@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
-print("\n=== RF01 ===")
-
 def gerar_dataset_vendas(n_registros=200, seed=42): 
     """Gera um dataset sintetico de vendas com dados sujos.""" 
     random.seed(seed)
@@ -65,13 +63,6 @@ def gerar_dataset_vendas(n_registros=200, seed=42):
         }) 
     return pd.DataFrame(dados) 
 
-df_bruto = gerar_dataset_vendas() 
-df_bruto.to_csv("vendas.csv", index=False) 
-print(f"Dataset gerado com {len(df_bruto)} registros.") 
-print(df_bruto.head())
-
-print("\n=== RF02 ===")
-
 def inspecionar_dados(df):
     """Exibe as informações estruturais do DataFrame."""
     print("\n=== INSPEÇÃO INICIAL DO DATASET ===")
@@ -81,9 +72,6 @@ def inspecionar_dados(df):
     print(f"\nValores nulos por coluna: \n{df.isnull().sum()}")
     print(f"\nPrimeiros registros: \n{df.head()}")
     return df
-df_bruto = inspecionar_dados(df_bruto)
-
-print("\n=== RF03 ===")
 
 def limpar_dados(df):
     """Limpa o DataFrame de vendas e retorna os dados limpos e um relatório."""
@@ -150,10 +138,6 @@ def limpar_dados(df):
         print(f"{item}: {quantidade}")
 
     return df, relatorio
-df_limpo, relatorio_limpeza = limpar_dados(df_bruto)
-inspecionar_dados(df_limpo)
-
-print("\n=== RF04 ===")
 
 def criar_colunas_derivadas(df):
     """Cria colunas derivadas no DataFrame."""
@@ -180,10 +164,6 @@ def criar_colunas_derivadas(df):
     faixas = ["Baixo Valor", "Medio Valor", "Alto Valor"]
     df["faixa_receita_item"] = np.select(condicoes, faixas, default="Nao Classificado")
     return df
-df_transformado = criar_colunas_derivadas(df_limpo)
-print(df_transformado.head())
-
-print("\n=== RF05 ===")
 
 def calcular_metricas(df):
     """Calcula as metricas agregadas do dataset."""
@@ -232,18 +212,6 @@ def calcular_metricas(df):
         "por_regiao": por_regiao
     }
     return metricas
-metricas = calcular_metricas(df_transformado)
-
-print("\n=== POR MÊS ===")
-print(metricas["por_mes"])
-print("\n=== TOP PRODUTOS ===")
-print(metricas["top_produtos"])
-print("\n=== POR CATEGORIA ===")
-print(metricas["por_categoria"])
-print("\n=== POR REGIÃO ===")
-print(metricas["por_regiao"])
-
-print("\n=== RF06 ===")
 
 def segmentar_clientes(df):
     """Agrupa clientes por total gasto e os classifica em segmentos."""
@@ -269,10 +237,6 @@ def segmentar_clientes(df):
     print(clientes["segmento"].value_counts())
 
     return clientes
-
-clientes = segmentar_clientes(df_transformado)
-
-print("\n=== RF07 ===")
 
 def calcular_estatisticas_numpy(df):
     """Calcula estatísticas e demonstra operações vetorizadas com NumPy."""
@@ -311,10 +275,6 @@ def calcular_estatisticas_numpy(df):
     print(f"Primeiras receitas escalonadas: {receitas_escalonadas[:5]}")
 
     return estatisticas
-
-estatisticas = calcular_estatisticas_numpy(df_transformado)
-
-print("\n=== RF08 ===")
 
 def criar_visualizacoes(df, metricas):
     """Cria e exporta os gráficos do projeto."""
@@ -445,10 +405,6 @@ def criar_visualizacoes(df, metricas):
 
     print("Gráficos salvos em outputs/graficos/")
 
-criar_visualizacoes(df_transformado, metricas)
-
-print("\n=== RF09 ===")
-
 def processar_coluna(df, coluna, funcao_transformacao, nome_saida=None):
     """Aplica uma função de transformação a uma coluna do DataFrame."""
 
@@ -459,26 +415,6 @@ def processar_coluna(df, coluna, funcao_transformacao, nome_saida=None):
     df[nome_saida] = df[coluna].apply(funcao_transformacao)
 
     return df
-
-df_transformado = processar_coluna(
-    df_transformado,
-    "receita_total",
-    lambda valor: round(valor / 1000, 2),
-    nome_saida="receita_em_milhares"
-)
-
-df_transformado = processar_coluna(
-    df_transformado,
-    "quantidade",
-    lambda quantidade: "Alto Volume" if quantidade > 5 else "Baixo Volume",
-    nome_saida="perfil_volume"
-)
-
-print(
-    df_transformado[
-        ["receita_total", "receita_em_milhares", "quantidade", "perfil_volume"]
-    ].head()
-)
 
 class AnalisadorDeVendas:
     """Encapsula o fluxo de análise dos dados de vendas."""
@@ -561,8 +497,6 @@ class AnalisadorDeVendas:
             f"{len(self.clientes)}"
         )
 
-print("\n=== RF10 ===")
-
 def exportar_resultados(metricas, clientes, estatisticas):
     """Exporta as métricas, a segmentação e as estatísticas do projeto."""
 
@@ -603,9 +537,6 @@ def exportar_resultados(metricas, clientes, estatisticas):
     print(f"JSON gravado e lido: {conferencia}")
 
     return conferencia
-exportar_resultados(metricas, clientes, estatisticas)
-
-print("\n=== RF11 ===")
 
 def main():
     """Executa o fluxo completo do SalesInsight PY."""
@@ -671,7 +602,6 @@ def main():
     analisador.resumo()
 
     print("\n[CONCLUÍDO] Fluxo finalizado com sucesso.")
-
 
 if __name__ == "__main__":
     main()
