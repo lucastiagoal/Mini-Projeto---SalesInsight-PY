@@ -44,7 +44,7 @@ O foco do projeto é praticar Python, Pandas, NumPy e visualização de dados.
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/lucastiagoal/Mini-Projeto---SalesInsight-PY
+git clone https://github.com/lucastiagoal/Mini-Projeto---SalesInsight-PY.git salesinsight-py
 cd salesinsight-py
 ```
 
@@ -52,12 +52,7 @@ cd salesinsight-py
 
 ```bash
 python -m venv .venv
-```
-
-No Windows:
-
-```bash
-.venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 ```
 
 ### 3. Instale as dependências
