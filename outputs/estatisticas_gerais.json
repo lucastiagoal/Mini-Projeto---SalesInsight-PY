@@ -1,9 +1,9 @@
 {
-    "media_receita": 7051.07,
-    "mediana_receita": 3330.66,
-    "desvio_padrao_receita": 7809.92,
-    "receita_total": 1290346.3,
-    "menor_receita": 104.19,
-    "maior_receita": 38833.2,
-    "vendas_acima_da_media": 70.0
+    "media_receita": 6867.61,
+    "mediana_receita": 2892.44,
+    "desvio_padrao_receita": 7943.79,
+    "receita_total": 2953071.84,
+    "menor_receita": 102.3,
+    "maior_receita": 36820.4,
+    "vendas_acima_da_media": 155.0
 }

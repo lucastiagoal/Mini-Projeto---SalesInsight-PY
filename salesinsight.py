@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
-def gerar_dataset_vendas(n_registros=200, seed=42): 
+def gerar_dataset_vendas(n_registros=500, seed=93): 
     """Gera um dataset sintetico de vendas com dados sujos.""" 
     random.seed(seed)
     np.random.seed(seed)
