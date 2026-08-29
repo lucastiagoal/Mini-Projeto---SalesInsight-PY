@@ -5,7 +5,7 @@ Projeto avaliativo do curso **Desenvolvimento de IA para Análise Preditiva** da
 ## Sobre o projeto
 
 O SalesInsight PY realiza a análise exploratória de um conjunto de vendas. O programa gera e carrega um dataset em CSV, trata dados inconsistentes, cria novas colunas, calcula métricas e produz visualizações para apoiar a tomada de decisão.
-O foco do projeto é praticar Python, Pandas, NumPy e visualizaço de dados.
+O foco do projeto é praticar Python, Pandas, NumPy e visualização de dados.
 
 ## Perguntas respondidas pela análise
 
@@ -21,7 +21,7 @@ O foco do projeto é praticar Python, Pandas, NumPy e visualizaço de dados.
 - Inspeção da estrutura e dos valores nulos do dataset;
 - Limpeza de espaços, datas inválidas, valores nulos e nomes de clientes com expressões regulares;
 - Criação de colunas derivadas, como receita total, mês, trimestre, ano e faixa de receita;
-- Calculo de métricas por mês, produto, categoria e região;
+- Cálculo de métricas por mês, produto, categoria e região;
 - Segmentação de clientes por nível de gasto;
 - Operações vetorizadas com NumPy;
 - Gráficos de linha, barras, dispersão e painel-resumo;
@@ -44,7 +44,7 @@ O foco do projeto é praticar Python, Pandas, NumPy e visualizaço de dados.
 ### 1. Clone o repositório
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/lucastiagoal/Mini-Projeto---SalesInsight-PY
 cd salesinsight-py
 ```
 
@@ -57,7 +57,7 @@ python -m venv .venv
 No Windows:
 
 ```bash
-.venv\\Scripts\\activate
+.venv\Scripts\activate
 ```
 
 ### 3. Instale as dependências
@@ -95,6 +95,12 @@ salesinsight-py/
 ## Decisoes técnicas
 
 Os registros com data inválida ou valores ausentes nas colunas críticas são removidos, pois não permitem calcular a receita de forma confiável. Essa escolha preserva a consistência das métricas e dos gráficos.
-Para classificar a receita por venda, será usado `np.select`, pois ele permite aplicar condições de forma vetorizada, evitando um laco manual sobre cada registro.
+Para classificar a receita por venda, foi usado `np.select`, pois ele permite aplicar condições de forma vetorizada, evitando um laço manual sobre cada registro.
 
 ## Status do desenvolvimento
+
+Projeto concluído. O fluxo executa a geração ou carregamento dos dados, limpeza, transformações, métricas, segmentação, operações com NumPy, visualizações e exportação de resultados.
+
+## Vídeo de demonstração
+
+[Assista ao vídeo de demonstração](COLE_AQUI_O_LINK_DO_VIDEO)
